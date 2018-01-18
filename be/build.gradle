@@ -31,6 +31,7 @@ compileTestKotlin {
 	kotlinOptions.jvmTarget = "1.8"
 }
 
+
 repositories {
 	mavenCentral()
 	maven { url "https://repo.spring.io/snapshot" }
@@ -39,12 +40,15 @@ repositories {
 
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-web')
+
+	compile("org.springframework.boot:spring-boot-starter-actuator")
+	compile("org.springframework.boot:spring-boot-starter-web")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.3")
 	compile("com.graphql-java:graphql-spring-boot-starter:3.10.0")
-	compile('com.graphql-java:graphql-java-tools:4.3.0')
+	compile("com.graphql-java:graphql-java-tools:4.3.0")
+	compile("org.janusgraph:janusgraph-core:0.2.0")
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
