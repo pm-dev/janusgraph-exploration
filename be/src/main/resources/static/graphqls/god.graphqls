@@ -1,0 +1,6 @@
+type Titan {
+
+    age: Int!
+
+    name: String!
+}
