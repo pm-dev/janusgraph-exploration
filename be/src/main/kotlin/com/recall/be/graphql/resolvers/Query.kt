@@ -1,23 +1,38 @@
 package com.recall.be.graphql.resolvers
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver
-import com.recall.be.datamodel.*
+import com.recall.be.datamodel.Titan
+import com.recall.be.datamodel.asTitan
 import com.recall.be.graphql.dataloaders.VertexDataLoader
+import com.recall.be.graphql.dataloaders.loadTitan
 import graphql.schema.DataFetchingEnvironment
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
-import org.apache.tinkerpop.gremlin.structure.Vertex
-import org.janusgraph.core.JanusGraph
-import org.reflections.ReflectionUtils.withName
 import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
 
 @Component
 class Query(
-        val graph: JanusGraph,
-        val dataLoader: VertexDataLoader): GraphQLQueryResolver {
+        val dataLoader: VertexDataLoader
+): GraphQLQueryResolver {
 
-    fun helloWorld(environment: DataFetchingEnvironment): Titan {
-        val one = graph.traversal().V().has("name", "saturn").next().asTitan()
-        return one
+    fun helloWorld(environment: DataFetchingEnvironment): CompletableFuture<Titan> = dataLoader.loadTitan { source ->
+        Thread.sleep(5 * 1000)
+        source.V().has("name", "saturn")
     }
+
+    fun helloWorld2(environment: DataFetchingEnvironment): CompletableFuture<List<Titan>> = dataLoader.loadMany(
+            listOf(
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") },
+                    { source -> source.V().has("name", "saturn") }))
+            .thenApply { it.map {  it.single().asTitan() } }
 }

@@ -1,6 +1,16 @@
 package com.recall.be.datamodel
 
+import com.syncleus.ferma.AbstractVertexFrame
+import com.syncleus.ferma.annotations.Property
 import org.apache.tinkerpop.gremlin.structure.Vertex
+
+//abstract class God: AbstractVertexFrame() {
+//
+//    val name get() = getProperty<String>("name")
+//
+//    @Property("")
+//    val age: String
+//}
 
 class God(vertex: Vertex) {
 
