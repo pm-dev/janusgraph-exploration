@@ -1,16 +1,20 @@
 package com.recall.be
 
+import com.recall.be.datamodel.Character
+import com.recall.be.datamodel.Droid
+import com.recall.be.datamodel.Episode
+import com.recall.be.datamodel.Human
+import com.syncleus.ferma.DelegatingFramedGraph
+import com.syncleus.ferma.FramedGraph
 import graphql.execution.instrumentation.Instrumentation
-import org.springframework.boot.SpringApplication
-import org.springframework.boot.autoconfigure.SpringBootApplication
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation
-import org.apache.commons.configuration.Configuration
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
-import org.dataloader.DataLoaderRegistry
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderOptions
+import org.dataloader.DataLoaderRegistry
 import org.janusgraph.core.JanusGraph
 import org.janusgraph.core.JanusGraphFactory
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ClassPathResource
 
@@ -41,7 +45,15 @@ class Application {
         return JanusGraphFactory.open(configuration)
     }
 
-
+    @Bean
+    fun fg(graph: JanusGraph): FramedGraph {
+        val types = setOf(
+                Character::class.java,
+                Droid::class.java,
+                Human::class.java,
+                Episode::class.java)
+        return DelegatingFramedGraph(graph, true, types)
+    }
 }
 
 fun main(args: Array<String>) {
