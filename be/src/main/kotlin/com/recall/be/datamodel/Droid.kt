@@ -5,7 +5,7 @@ import com.syncleus.ferma.annotations.GraphElement
 import com.syncleus.ferma.annotations.Property
 
 @GraphElement
-abstract class Droid: Character, AbstractVertexFrame() {
+abstract class Droid: AbstractVertexFrame(), Character {
 
     @Property("primaryFunction")
     abstract fun getPrimaryFunction(): String

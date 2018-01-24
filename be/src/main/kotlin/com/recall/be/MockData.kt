@@ -20,13 +20,12 @@ class ApplicationReadyListener(
     override fun onApplicationEvent(event: ApplicationReadyEvent?) {
 //        GraphOfTheGodsFactory.loadWithoutMixedIndex(graph, true)
 
-
-        println("Did load Graph of the Gods")
-
         println("is open ${fg.tx().isOpen}")
 
         val newHope = fg.addFramedVertex(Episode::class.java)
         newHope.setName("New Hope")
+
+        println("is open ${fg.tx().isOpen}")
 
         val jedi = fg.addFramedVertex(Episode::class.java)
         jedi.setName("Return of the Jedi")

@@ -5,10 +5,9 @@ import com.syncleus.ferma.annotations.Adjacency
 import com.syncleus.ferma.annotations.GraphElement
 import com.syncleus.ferma.annotations.Incidence
 import com.syncleus.ferma.annotations.Property
-import org.apache.tinkerpop.gremlin.structure.Vertex
 
 @GraphElement
-interface Character: Vertex {
+interface Character: VertexFrame {
 
     val id get() = "123"
 

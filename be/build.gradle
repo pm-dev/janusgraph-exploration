@@ -52,7 +52,6 @@ dependencies {
 	compile("org.janusgraph:janusgraph-core:0.2.0")
 	compile("com.syncleus.ferma:ferma:3.2.1")
 	compile("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.21.2")
-	compile group: 'com.github.karthicks', name: 'gremlin-objects', version: '3.3.1-RC1'
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
