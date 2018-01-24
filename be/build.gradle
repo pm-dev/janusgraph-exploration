@@ -48,10 +48,13 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.3")
 	compile("com.graphql-java:graphql-spring-boot-starter:3.10.0")
-	compile("com.graphql-java:graphql-java-tools:4.3.0")
 	compile("org.janusgraph:janusgraph-core:0.2.0")
 	compile("com.syncleus.ferma:ferma:3.2.1")
 	compile("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:0.21.2")
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+
+
+	// Graphql tools dependency
+	compile("com.esotericsoftware:reflectasm:1.11.3")
 }

@@ -20,12 +20,8 @@ class ApplicationReadyListener(
     override fun onApplicationEvent(event: ApplicationReadyEvent?) {
 //        GraphOfTheGodsFactory.loadWithoutMixedIndex(graph, true)
 
-        println("is open ${fg.tx().isOpen}")
-
         val newHope = fg.addFramedVertex(Episode::class.java)
         newHope.setName("New Hope")
-
-        println("is open ${fg.tx().isOpen}")
 
         val jedi = fg.addFramedVertex(Episode::class.java)
         jedi.setName("Return of the Jedi")
@@ -76,8 +72,6 @@ class ApplicationReadyListener(
         aretoo.addFriends(lukeSkywalker, hanSolo, leiaOrgana)
 
         fg.tx().commit()
-        val fetched = fg.traverse<Traversable<*, *>> { g -> g.V().has("name", "Luke Skywalker") }.next(Human::class.java)
-
-        println("fetched $fetched")
+        println("Committed Mock Data")
     }
 }
