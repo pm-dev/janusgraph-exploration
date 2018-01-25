@@ -7,9 +7,15 @@ import com.recall.be.graphql.dataloaders.VertexDataLoader
 import com.recall.be.graphql.dataloaders.loadTitan
 import com.syncleus.ferma.FramedGraph
 import com.syncleus.ferma.Traversable
+import com.syncleus.ferma.VertexFrame
 import graphql.schema.DataFetchingEnvironment
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.future.future
+import org.dataloader.BatchLoader
 import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionStage
+import java.util.function.Function
 
 @Component
 class Query(
@@ -61,24 +67,53 @@ class Query(
     }
 }
 
+//
+//{ keys ->
+//    future {
+//        val source = graph.traversal()
+//        keys
+//                .map { it(source) }
+//                .map { async {
+//                    println("sleeping for a second")
+//                    Thread.sleep(1 * 1000)
+//                    it.
+//                } }
+//                .map { it.await() }
+//    }
+//}
 
-@Component
-class HumanResolver: GraphQLResolver<Human> {
-    fun getId(human: Human) = human.id
-    fun getName(human: Human) = human.getName()
-    fun getAppearsIn(human: Human) = human.getAppearsIn()
-    fun getFriends(human: Human) = human.getFriends()
+class BatchTraversalLoader<K: VertexFrame>(
+        val clazz: Class<K>
+): BatchLoader<Traversable<VertexFrame, K>, List<K>> {
+
+    override fun load(keys: MutableList<Traversable<VertexFrame, K>>?): CompletionStage<List<List<K>>> {
+        return future {
+            keys
+                    ?.map { async { it.toList(clazz) } }
+                    ?.map { it.await() }
+                    ?: listOf<List<K>>()
+        }
+    }
 }
 
-@Component
-class DroidResolver: GraphQLResolver<Droid> {
-    fun getId(droid: Droid) = droid.id
-    fun getName(droid: Droid) = droid.getName()
-    fun getAppearsIn(droid: Droid) = droid.getAppearsIn()
-    fun getFriends(droid: Droid) = droid.getFriends()
-}
 
-@Component
-class EpisodeResolver: GraphQLResolver<Episode> {
-    fun getName(episode: Episode) = episode.getName()
-}
+//@Component
+//class HumanResolver: GraphQLResolver<Human> {
+//    fun getId(human: Human) = human.id
+//    fun getName(human: Human) = human.getName()
+//    fun getAppearsIn(human: Human) = human.getAppearsIn()
+//    fun getFriends(human: Human) = human.getFriends()
+//}
+//
+//@Component
+//class DroidResolver: GraphQLResolver<Droid> {
+//    fun getId(droid: Droid) = droid.id
+//    fun getName(droid: Droid) = droid.getName()
+//    fun getAppearsIn(droid: Droid) = droid.getAppearsIn()
+//    fun getFriends(droid: Droid) = droid.getFriends()
+//}
+//
+//@Component
+//class EpisodeResolver: GraphQLResolver<Episode> {
+//    fun getName(episode: Episode) = episode.getName()
+//}

@@ -2,6 +2,7 @@ package com.recall.be.graphql.dataloaders
 
 import com.recall.be.datamodel.asGod
 import com.recall.be.datamodel.asTitan
+import com.syncleus.ferma.Traversable
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.future.future
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component
 class VertexDataLoader(
         graph: JanusGraph,
         options: DataLoaderOptions
-): DataLoader<(GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>, List<Vertex>>({ keys ->
+): DataLoader<(GraphTraversalSource) -> Traversable<Vertex, Vertex>, List<Vertex>>({ keys ->
     future {
         val source = graph.traversal()
         keys
@@ -25,7 +26,7 @@ class VertexDataLoader(
                 .map { async {
                     println("sleeping for a second")
                     Thread.sleep(1 * 1000)
-                    it.toList()
+                    it.
                 } }
                 .map { it.await() }
     }
@@ -38,17 +39,12 @@ fun VertexDataLoader.loadTitan(traversal: (GraphTraversalSource) -> GraphTravers
 fun VertexDataLoader.loadTitanMaybe(traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>) =
         load { traversal(it) }.thenApplyAsync { it.maybe()?.asTitan() }
 
-fun VertexDataLoader.loadTitans(traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>) =
-        load { traversal(it) }.thenApplyAsync { it.map { it.asTitan() } }
-
-fun VertexDataLoader.loadGod(traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>) =
-        load { traversal(it) }.thenApplyAsync { it.single().asGod() }
-
-fun VertexDataLoader.loadGodMaybe(traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>) =
-        load { traversal(it) }.thenApplyAsync { it.maybe()?.asGod() }
-
-fun VertexDataLoader.loadGods(traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>) =
-        load { traversal(it) }.thenApplyAsync { it.map { it.asGod() } }
+inline fun <reified T> VertexDataLoader.loadMany(
+        crossinline traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>
+): List<T> =
+        load { traversal(it) }.thenApplyAsync {  } }
 
 fun <T> Iterable<T>.maybe(): T? =
         if (!iterator().hasNext()) null else single()
+
+

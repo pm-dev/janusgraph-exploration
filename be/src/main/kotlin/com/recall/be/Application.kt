@@ -46,13 +46,13 @@ class Application {
     }
 
     @Bean
-    fun fg(graph: JanusGraph): FramedGraph {
+    fun framedGraph(graph: JanusGraph): FramedGraph {
         val types = setOf(
                 Character::class.java,
                 Droid::class.java,
                 Human::class.java,
                 Episode::class.java)
-        return DelegatingFramedGraph(graph, true, types)
+        return DelegatingFramedGraph<JanusGraph>(graph, true, types)
     }
 }
 

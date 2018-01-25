@@ -4,18 +4,13 @@ import com.recall.be.datamodel.Droid
 import com.recall.be.datamodel.Episode
 import com.recall.be.datamodel.Human
 import com.syncleus.ferma.FramedGraph
-import com.syncleus.ferma.Traversable
-import org.janusgraph.core.JanusGraph
-import org.janusgraph.example.GraphOfTheGodsFactory
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Component
 
 
 @Component
-class ApplicationReadyListener(
-        val graph: JanusGraph,
-        val fg: FramedGraph): ApplicationListener<ApplicationReadyEvent> {
+class ApplicationReadyListener(val fg: FramedGraph): ApplicationListener<ApplicationReadyEvent> {
 
     override fun onApplicationEvent(event: ApplicationReadyEvent?) {
 //        GraphOfTheGodsFactory.loadWithoutMixedIndex(graph, true)
