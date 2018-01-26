@@ -1,4 +1,4 @@
-extend type Query {
+type Query {
     # If episode omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode
     hero(episode: String): Character
     # Find human by id
@@ -12,11 +12,11 @@ extend type Query {
 # One of the films in the Star Wars Trilogy
 type Episode {
     # Released in 1977
-#    NEWHOPE,
+   # NEW_HOPE,
     # Released in 1980
- #   EMPIRE,
+   # EMPIRE,
     # Released in 1983
-  #  JEDI
+   # JEDI
   name: String!
 }
 

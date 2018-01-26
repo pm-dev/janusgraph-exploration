@@ -1,8 +1,6 @@
 package com.recall.be
 
-import com.recall.be.datamodel.Droid
-import com.recall.be.datamodel.Episode
-import com.recall.be.datamodel.Human
+import com.recall.be.datamodel.*
 import com.syncleus.ferma.FramedGraph
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.ApplicationListener
@@ -27,34 +25,34 @@ class ApplicationReadyListener(val fg: FramedGraph): ApplicationListener<Applica
         val lukeSkywalker = fg.addFramedVertex(Human::class.java)
         lukeSkywalker.setName("Luke Skywalker")
         lukeSkywalker.setHomePlanet("Tatooine")
-        lukeSkywalker.addAppearsIns(newHope, jedi, empire)
+        lukeSkywalker.setAppearsIn(newHope, jedi, empire)
 
         val darthVader = fg.addFramedVertex(Human::class.java)
         darthVader.setName("Darth Vader")
         darthVader.setHomePlanet("Tatooine")
-        darthVader.addAppearsIns(newHope, jedi, empire)
+        darthVader.setAppearsIn(newHope, jedi, empire)
 
         val hanSolo = fg.addFramedVertex(Human::class.java)
         hanSolo.setName("Han Solo")
-        hanSolo.addAppearsIns(newHope, jedi, empire)
+        hanSolo.setAppearsIn(newHope, jedi, empire)
 
         val leiaOrgana = fg.addFramedVertex(Human::class.java)
         leiaOrgana.setName("Leia Organa")
         leiaOrgana.setHomePlanet("Alderaan")
-        leiaOrgana.addAppearsIns(newHope, jedi, empire)
+        leiaOrgana.setAppearsIn(newHope, jedi, empire)
 
         val wilhuffTarkin = fg.addFramedVertex(Human::class.java)
         wilhuffTarkin.setName("Wilhuff Tarkin")
-        wilhuffTarkin.addAppearsIns(newHope)
+        wilhuffTarkin.setAppearsIn(newHope)
 
         val c3po = fg.addFramedVertex(Droid::class.java)
         c3po.setName("C-3PO")
-        c3po.addAppearsIns(newHope, jedi, empire)
+        c3po.setAppearsIn(newHope, jedi, empire)
         c3po.setPrimaryFunction("Protocol")
 
         val aretoo = fg.addFramedVertex(Droid::class.java)
         aretoo.setName("R2-D2")
-        aretoo.addAppearsIns(newHope, jedi, empire)
+        aretoo.setAppearsIn(newHope, jedi, empire)
         aretoo.setPrimaryFunction("Astromech")
 
         lukeSkywalker.addFriends(hanSolo, leiaOrgana, c3po, aretoo)

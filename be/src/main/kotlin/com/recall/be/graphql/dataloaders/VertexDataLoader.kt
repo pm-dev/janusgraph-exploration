@@ -1,50 +1,70 @@
 package com.recall.be.graphql.dataloaders
 
-import com.recall.be.datamodel.asGod
-import com.recall.be.datamodel.asTitan
+import com.recall.be.datamodel.Character
+import com.recall.be.datamodel.Droid
+import com.recall.be.datamodel.Human
 import com.syncleus.ferma.Traversable
+import com.syncleus.ferma.VertexFrame
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.future.future
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
-import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.dataloader.BatchLoader
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderOptions
-import org.janusgraph.core.JanusGraph
 import org.springframework.stereotype.Component
+import java.util.concurrent.CompletionStage
+import kotlin.reflect.KClass
 
+
+inline fun <reified T: VertexFrame> EntityLoader.loadMaybe(traversal: Traversable<VertexFrame, T>) =
+        T::class.loader().load(traversal).thenApplyAsync { it.maybe() }
+
+inline fun <reified T: VertexFrame> EntityLoader.loadSingle(traversal: Traversable<VertexFrame, T>) =
+        T::class.loader().load(traversal).thenApplyAsync { it.single() }
+
+inline fun <reified T: VertexFrame> EntityLoader.loadMany(traversal: Traversable<VertexFrame, T>) =
+        T::class.loader().load(traversal)
 
 @Component
-class VertexDataLoader(
-        graph: JanusGraph,
+class EntityLoader(
+        val characterDataLoader: CharacterDataLoader,
+        val humanDataLoader: HumanDataLoader,
+        val droidDataLoader: DroidDataLoader
+) {
+    final inline fun <reified T: VertexFrame> KClass<T>.loader() = when (this) {
+        Human::class -> humanDataLoader
+        Character::class -> characterDataLoader
+        Droid::class -> droidDataLoader
+        else -> throw IllegalStateException()
+    } as DataLoader<Traversable<VertexFrame, T>, List<T>>
+}
+
+@Component
+class CharacterDataLoader(
         options: DataLoaderOptions
-): DataLoader<(GraphTraversalSource) -> Traversable<Vertex, Vertex>, List<Vertex>>({ keys ->
-    future {
-        val source = graph.traversal()
-        keys
-                .map { it(source) }
-                .map { async {
-                    println("sleeping for a second")
-                    Thread.sleep(1 * 1000)
-                    it.
-                } }
-                .map { it.await() }
+): DataLoader<Traversable<VertexFrame, Character>, List<Character>>(BatchTraversalLoader(Character::class), options)
+
+@Component
+class HumanDataLoader(
+        options: DataLoaderOptions
+): DataLoader<Traversable<VertexFrame, Human>, List<Human>>(BatchTraversalLoader(Human::class), options)
+
+@Component
+class DroidDataLoader(
+        options: DataLoaderOptions
+): DataLoader<Traversable<VertexFrame, Human>, List<Human>>(BatchTraversalLoader(Human::class), options)
+
+private class BatchTraversalLoader<K: VertexFrame>(
+        private val clazz: KClass<K>
+): BatchLoader<Traversable<VertexFrame, K>, List<K>> {
+    override fun load(keys: MutableList<Traversable<VertexFrame, K>>?): CompletionStage<List<List<K>>> {
+        return future {
+            keys
+                    ?.map { async { it.toList(clazz.java) } }
+                    ?.map { it.await() }
+                    ?: listOf<List<K>>()
+        }
     }
-}, options)
-
-
-fun VertexDataLoader.loadTitan(traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>) =
-        load { traversal(it) }.thenApplyAsync { it.single().asTitan() }
-
-fun VertexDataLoader.loadTitanMaybe(traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>) =
-        load { traversal(it) }.thenApplyAsync { it.maybe()?.asTitan() }
-
-inline fun <reified T> VertexDataLoader.loadMany(
-        crossinline traversal: (GraphTraversalSource) -> GraphTraversal<Vertex, Vertex>
-): List<T> =
-        load { traversal(it) }.thenApplyAsync {  } }
+}
 
 fun <T> Iterable<T>.maybe(): T? =
         if (!iterator().hasNext()) null else single()
-
-

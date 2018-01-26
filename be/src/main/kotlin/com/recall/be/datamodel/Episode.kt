@@ -1,10 +1,11 @@
 package com.recall.be.datamodel
 
-import com.syncleus.ferma.AbstractVertexFrame
-import com.syncleus.ferma.VertexFrame
+import com.syncleus.ferma.annotations.GraphElement
 import com.syncleus.ferma.annotations.Property
 
-interface Episode: VertexFrame {
+
+@GraphElement
+interface Episode {
 
     @Property("name")
     fun getName(): String

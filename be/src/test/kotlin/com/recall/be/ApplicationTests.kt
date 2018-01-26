@@ -1,16 +1,11 @@
 package com.recall.be
 
-import com.recall.be.datamodel.asTitan
-import org.assertj.core.api.Assertions
 import org.janusgraph.core.JanusGraph
-import org.janusgraph.core.JanusGraphFactory
-import org.janusgraph.example.GraphOfTheGodsFactory
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.core.io.ClassPathResource
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
@@ -28,7 +23,7 @@ class ApplicationTests {
 
 	@Test
 	fun contextLoads() {
-		val one = graph.traversal().V().has("name", "saturn").next().asTitan()
-		Assertions.assertThat(one.age).isEqualTo(10000)
+//		val one = graph.traversal().V().has("name", "saturn").next().asTitan()
+//		Assertions.assertThat(one.age).isEqualTo(10000)
 	}
 }
