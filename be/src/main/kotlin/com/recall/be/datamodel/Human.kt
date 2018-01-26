@@ -13,4 +13,3 @@ abstract class Human: Character, AbstractVertexFrame() {
     @Property("homePlanet")
     abstract fun setHomePlanet(homePlanet: String)
 }
-

@@ -1,67 +1,66 @@
 package com.recall.be.graphql.dataloaders
 
-import com.recall.be.datamodel.Character
-import com.recall.be.datamodel.Droid
-import com.recall.be.datamodel.Human
+import com.syncleus.ferma.FramedGraph
 import com.syncleus.ferma.Traversable
 import com.syncleus.ferma.VertexFrame
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.future.future
+import org.apache.tinkerpop.gremlin.process.traversal.Traversal
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
+import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.dataloader.BatchLoader
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderOptions
 import org.springframework.stereotype.Component
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
-import kotlin.reflect.KClass
 
 
-inline fun <reified T: VertexFrame> EntityLoader.loadMaybe(traversal: Traversable<VertexFrame, T>) =
-        T::class.loader().load(traversal).thenApplyAsync { it.maybe() }
+inline fun <reified T: VertexFrame> TraversableLoader.loadMaybe(traversal: (GraphTraversalSource) -> Traversal<Vertex, Vertex>): CompletableFuture<T?> =
+        this.load(traversal(graph.rawTraversal)).thenApplyAsync { it.maybe()?.let { graph.frameElement(it, T::class.java) } }
 
-inline fun <reified T: VertexFrame> EntityLoader.loadSingle(traversal: Traversable<VertexFrame, T>) =
-        T::class.loader().load(traversal).thenApplyAsync { it.single() }
+inline fun <reified T: VertexFrame> TraversableLoader.loadSingle(traversal: (GraphTraversalSource) -> Traversal<Vertex, Vertex>): CompletableFuture<T> =
+        this.load(traversal(graph.rawTraversal)).thenApplyAsync { it.single().let { graph.frameElement(it, T::class.java) } }
 
-inline fun <reified T: VertexFrame> EntityLoader.loadMany(traversal: Traversable<VertexFrame, T>) =
-        T::class.loader().load(traversal)
+inline fun <reified T: VertexFrame> TraversableLoader.loadMany(traversal: (GraphTraversalSource) -> Traversal<Vertex, Vertex>): CompletableFuture<List<T>> =
+        this.load(traversal(graph.rawTraversal)).thenApply { it.map { graph.frameElement(it, T::class.java) } }
+
+
+inline fun <reified T: VertexFrame> TraversableLoader2.loadMany(traversal: Traversable<*, T>): CompletableFuture<List<T>> =
+        this.load(traversal.rawTraversal).thenApply { it.map { it.reframe(T::class.java) } }
 
 @Component
-class EntityLoader(
-        val characterDataLoader: CharacterDataLoader,
-        val humanDataLoader: HumanDataLoader,
-        val droidDataLoader: DroidDataLoader
-) {
-    final inline fun <reified T: VertexFrame> KClass<T>.loader() = when (this) {
-        Human::class -> humanDataLoader
-        Character::class -> characterDataLoader
-        Droid::class -> droidDataLoader
-        else -> throw IllegalStateException()
-    } as DataLoader<Traversable<VertexFrame, T>, List<T>>
+class TraversableLoader(
+        val graph: FramedGraph,
+        options: DataLoaderOptions
+): DataLoader<Traversal<*, Vertex>, List<Vertex>>(BatchTraversalLoader(), options) {
+//    fun s() {
+//        graph.traverse<> {  }
+//    }
 }
 
 @Component
-class CharacterDataLoader(
+class TraversableLoader2(
+        val graph: FramedGraph,
         options: DataLoaderOptions
-): DataLoader<Traversable<VertexFrame, Character>, List<Character>>(BatchTraversalLoader(Character::class), options)
+): DataLoader<Traversal<*, out VertexFrame>, List<VertexFrame>>(BatchTraversalLoader2(), options) {
+//    fun s() {
+//        graph.traverse<> {  }
+//    }
+}
 
-@Component
-class HumanDataLoader(
-        options: DataLoaderOptions
-): DataLoader<Traversable<VertexFrame, Human>, List<Human>>(BatchTraversalLoader(Human::class), options)
-
-@Component
-class DroidDataLoader(
-        options: DataLoaderOptions
-): DataLoader<Traversable<VertexFrame, Human>, List<Human>>(BatchTraversalLoader(Human::class), options)
-
-private class BatchTraversalLoader<K: VertexFrame>(
-        private val clazz: KClass<K>
-): BatchLoader<Traversable<VertexFrame, K>, List<K>> {
-    override fun load(keys: MutableList<Traversable<VertexFrame, K>>?): CompletionStage<List<List<K>>> {
+private class BatchTraversalLoader: BatchLoader<Traversal<*, Vertex>, List<Vertex>> {
+    override fun load(keys: MutableList<Traversal<*, Vertex>>): CompletionStage<List<List<Vertex>>> {
         return future {
-            keys
-                    ?.map { async { it.toList(clazz.java) } }
-                    ?.map { it.await() }
-                    ?: listOf<List<K>>()
+            keys.map { async { it.toList() } }.map { it.await() }
+        }
+    }
+}
+
+private class BatchTraversalLoader2: BatchLoader<Traversal<*, out VertexFrame>, List<VertexFrame>> {
+    override fun load(keys: MutableList<Traversal<*, out VertexFrame>>): CompletionStage<List<List<VertexFrame>>> {
+        return future {
+            keys.map { async { it.toList() } }.map { it.await() }
         }
     }
 }
