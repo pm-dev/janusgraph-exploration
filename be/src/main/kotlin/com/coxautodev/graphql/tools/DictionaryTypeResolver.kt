@@ -12,23 +12,20 @@ import graphql.schema.TypeResolver
  * @author Andrew Potter
  */
 abstract class DictionaryTypeResolver(private val dictionary: BiMap<Class<*>, TypeDefinition>, private val types: Map<String, GraphQLObjectType>) : TypeResolver {
+    
+    private val namesToClass = dictionary.inverse().mapKeys { it.key.name }
 
     override fun getType(env: TypeResolutionEnvironment): GraphQLObjectType? {
         val obj = env.getObject<Any>()
         val clazz = obj.javaClass
         val name = dictionary[clazz]?.name ?: clazz.simpleName
-
         val type = types[name]
         if (type != null) {
             return type
         }
-
-        for (validClass in dictionary) {
-            if (validClass.key.isInstance(obj)) {
-                val gqlType = types[validClass.value.name]
-                if (gqlType != null) {
-                    return gqlType
-                }
+        for (validType in types) {
+            if (namesToClass[validType.key]?.isInstance(obj) == true) {
+                return validType.value
             }
         }
         throw TypeResolverError(getError(name))

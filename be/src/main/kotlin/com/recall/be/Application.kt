@@ -1,9 +1,6 @@
 package com.recall.be
 
-import com.recall.be.datamodel.Character
-import com.recall.be.datamodel.Droid
-import com.recall.be.datamodel.Episode
-import com.recall.be.datamodel.Human
+import com.recall.be.datamodel.*
 import com.syncleus.ferma.DelegatingFramedGraph
 import com.syncleus.ferma.FramedGraph
 import graphql.execution.instrumentation.Instrumentation
@@ -46,8 +43,9 @@ class Application {
     }
 
     @Bean
-    fun framedGraph(graph: JanusGraph): FramedGraph {
+    fun framedGraph(graph: JanusGraph): DelegatingFramedGraph<JanusGraph> {
         val types = setOf(
+                Node::class.java,
                 Character::class.java,
                 Droid::class.java,
                 Human::class.java,
@@ -59,3 +57,6 @@ class Application {
 fun main(args: Array<String>) {
     SpringApplication.run(Application::class.java, *args)
 }
+
+fun <T> Iterable<T>.optional(): T? =
+        if (!iterator().hasNext()) null else single()

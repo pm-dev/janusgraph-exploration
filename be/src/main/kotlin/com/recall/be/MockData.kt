@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component
 class ApplicationReadyListener(val fg: FramedGraph): ApplicationListener<ApplicationReadyEvent> {
 
     override fun onApplicationEvent(event: ApplicationReadyEvent?) {
-//        GraphOfTheGodsFactory.loadWithoutMixedIndex(graph, true)
 
         val newHope = fg.addFramedVertex(Episode::class.java)
         newHope.setName("New Hope")

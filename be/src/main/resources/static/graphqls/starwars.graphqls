@@ -1,23 +1,12 @@
 type Query {
     # If episode omitted, returns the hero of the whole saga. If provided, returns the hero of that particular episode
-    hero(episode: String): Character
+    hero: Character
     # Find human by id
-    human(name: String!): Human
+    human(id: String!): Human
     # Find droid by id
-    droid(name: String!): Droid
+    droid(id: String!): Droid
     # Find character by id
-    character(name: String!): Character
-}
-
-# One of the films in the Star Wars Trilogy
-type Episode {
-    # Released in 1977
-   # NEW_HOPE,
-    # Released in 1980
-   # EMPIRE,
-    # Released in 1983
-   # JEDI
-  name: String!
+    character(id: String!): Character
 }
 
 # A character in the Star Wars Trilogy
@@ -29,7 +18,7 @@ interface Character {
     # The friends of the character, or an empty list if they have none
     friends: [Character]
     # Which movies they appear in
-    appearsIn: [Episode]
+    # appearsIn: [Episode]
 }
 
 # A humanoid creature in the Star Wars universe
@@ -41,7 +30,7 @@ type Human implements Character {
     # The friends of the human, or an empty list if they have none
     friends: [Character]
     # Which movies they appear in
-    appearsIn: [Episode]
+    # appearsIn: [Episode]
     # The home planet of the human, or null if unknown
     homePlanet: String
 }
@@ -55,7 +44,7 @@ type Droid implements Character {
     # The friends of the droid, or an empty list if they have none
     friends: [Character]
     # Which movies they appear in
-    appearsIn: [Episode]
+    # appearsIn: [Episode]
     # The primary function of the droid
     primaryFunction: String
 }

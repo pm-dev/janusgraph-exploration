@@ -1,17 +1,17 @@
 package com.recall.be.datamodel
 
+import com.recall.be.gremlin.TraversableToMany
+import com.recall.be.gremlin.traverseToMany
+import com.recall.be.gremlin.verticies
+import com.syncleus.ferma.DelegatingFramedGraph
 import com.syncleus.ferma.Traversable
-import com.syncleus.ferma.VertexFrame
 import com.syncleus.ferma.annotations.Adjacency
 import com.syncleus.ferma.annotations.GraphElement
 import com.syncleus.ferma.annotations.Incidence
 import com.syncleus.ferma.annotations.Property
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
-import org.apache.tinkerpop.gremlin.structure.Vertex
 
 @GraphElement
-interface Character: VertexFrame {
+interface Character: Node {
 
     @Property("name")
     fun getName(): String
@@ -46,7 +46,10 @@ fun Character.setFriends(vararg friends: Character) = setFriends(friends.toSet()
 fun Character.addFriends(vararg friends: Character) = friends.forEach { addFriend(it) }
 fun Character.addFriends(friends: Set<Character>) = friends.forEach { addFriend(it) }
 
-fun GraphTraversalSource.from(vertexFrame: VertexFrame): GraphTraversal<Vertex, Vertex> = V(vertexFrame.getId())
+val Traversable<out Any?, out Character>.toFriends: TraversableToMany<*, Character> get() =
+    traverse { it.out("friends") }
 
-val Character.toFriends: Traversable<*, Character> get() = traverse { it.out("friends") }
-val Character.toAppearsIn: Traversable<*, Episode> get() = traverse { it.out("appearsIn") }
+val Traversable<out Any?, out Character>.toAppearsIn: TraversableToMany<*, Episode> get() =
+    traverse { it.out("appearsIn") }
+
+val DelegatingFramedGraph<*>.characters: TraversableToMany<Any, Character> get() = traverseToMany { it.verticies() }
