@@ -1,8 +1,5 @@
 package com.recall.be
 
-import com.recall.be.datamodel.*
-import com.syncleus.ferma.DelegatingFramedGraph
-import com.syncleus.ferma.FramedGraph
 import graphql.execution.instrumentation.Instrumentation
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation
 import org.dataloader.DataLoader
@@ -20,43 +17,24 @@ import org.springframework.core.io.ClassPathResource
 class Application {
 
     @Bean
-    fun dataLoaderRegistry(loaderList: List<DataLoader<*, *>>): DataLoaderRegistry {
-        val registry = DataLoaderRegistry()
-        for (loader in loaderList) {
-            registry.register(loader.javaClass.simpleName, loader)
-        }
-        return registry
-    }
+    fun dataLoaderRegistry(loaderList: List<DataLoader<*, *>>): DataLoaderRegistry =
+            loaderList.fold(
+                initial = DataLoaderRegistry(),
+                operation = { registry, loader -> registry.register(loader.javaClass.simpleName, loader)})
 
     @Bean
-    fun instrumentation(dataLoaderRegistry: DataLoaderRegistry): Instrumentation {
-        return DataLoaderDispatcherInstrumentation(dataLoaderRegistry)
-    }
+    fun instrumentation(dataLoaderRegistry: DataLoaderRegistry): Instrumentation =
+            DataLoaderDispatcherInstrumentation(dataLoaderRegistry)
 
     @Bean
-    fun dataLoaderOptions() = DataLoaderOptions()
+    fun dataLoaderOptions(): DataLoaderOptions =
+            DataLoaderOptions()
 
     @Bean
-    fun graph(): JanusGraph {
-        val configuration = ClassPathResource("janusgraph-configuration.properties").file.absolutePath
-        return JanusGraphFactory.open(configuration)
-    }
-
-    @Bean
-    fun framedGraph(graph: JanusGraph): DelegatingFramedGraph<JanusGraph> {
-        val types = setOf(
-                Node::class.java,
-                Character::class.java,
-                Droid::class.java,
-                Human::class.java,
-                Episode::class.java)
-        return DelegatingFramedGraph<JanusGraph>(graph, true, types)
-    }
+    fun graph(): JanusGraph =
+            JanusGraphFactory.open(ClassPathResource("janusgraph-configuration.properties").file.absolutePath)
 }
 
 fun main(args: Array<String>) {
     SpringApplication.run(Application::class.java, *args)
 }
-
-fun <T> Iterable<T>.optional(): T? =
-        if (!iterator().hasNext()) null else single()
