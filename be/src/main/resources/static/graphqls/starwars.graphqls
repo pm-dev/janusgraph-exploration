@@ -1,7 +1,7 @@
 type Query {
 
     # Find node by id
-    node(id: String!): Node
+    node(id: ID!): Node
 
     # Hero of the Star wars saga
     hero: Character
@@ -16,17 +16,23 @@ type Query {
     character(name: String!): Character
 }
 
+type Mutation {
+
+    # Create a new droid
+    createDroid(name: String!, primaryFunction: String!, friendIds: [ID!]!, appearsInIds: [ID!]!): Droid!
+}
+
 interface Node {
 
     # The id of the node
-    id: String!
+    id: ID!
 }
 
 # A character in the Star Wars Trilogy
 interface Character {
 
     # The id of the character
-    id: String!
+    id: ID!
 
     # The name of the character
     name: String!
@@ -36,13 +42,16 @@ interface Character {
 
     # Which movies they appear in
     appearsIn: [Episode!]!
+
+    # The friends of the droid, or an empty list if they have none
+    secondDegreeFriends(limit: Int): [Character!]!
 }
 
 # One of the films in the Star Wars Trilogy
 type Episode implements Node {
 
     # The id of the Episode
-    id: String!
+    id: ID!
 
     # The name of the episode
     name: String!
@@ -52,7 +61,7 @@ type Episode implements Node {
 type Human implements Node, Character {
 
     # The id of the human
-    id: String!
+    id: ID!
 
     # The name of the human
     name: String!
@@ -65,13 +74,16 @@ type Human implements Node, Character {
 
     # The home planet of the human, or null if unknown
     homePlanet: String
+
+    # The friends of the droid, or an empty list if they have none
+    secondDegreeFriends(limit: Int): [Character!]!
 }
 
 # A mechanical creature in the Star Wars universe
 type Droid implements Node, Character {
 
     # The id of the droid
-    id: String!
+    id: ID!
 
     # The name of the droid
     name: String!
