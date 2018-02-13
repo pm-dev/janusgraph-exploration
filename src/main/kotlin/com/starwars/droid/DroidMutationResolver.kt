@@ -24,9 +24,7 @@ class DroidMutationResolver(
             appearsInIds: Set<Long>,
             environment: DataFetchingEnvironment) = graph.mutate(object : Mutation<Droid>() {
 
-        override fun checkPermissions(graph: FramedGraph): Boolean {
-            return true
-        }
+        override fun checkPermissions(graph: FramedGraph) = true
 
         override fun run(graph: FramedGraph): Droid {
             val droid = graph.insert<Droid>()
