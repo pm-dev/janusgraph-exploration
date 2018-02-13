@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/janusgraph-exploration.iml" filepath="$PROJECT_DIR$/janusgraph-exploration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/janusgraph-exploration_main.iml" filepath="$PROJECT_DIR$/.idea/modules/janusgraph-exploration_main.iml" group="janusgraph-exploration" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/janusgraph-exploration_test.iml" filepath="$PROJECT_DIR$/.idea/modules/janusgraph-exploration_test.iml" group="janusgraph-exploration" />
+    </modules>
+  </component>
+</project>

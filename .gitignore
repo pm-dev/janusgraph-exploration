@@ -4,7 +4,8 @@
 !gradle/wrapper/gradle-wrapper.jar
 
 ### IntelliJ IDEA ###
-.idea
+.idea/**/libraries
+.idea/**/workspace.xml
 *.iws
 *.iml
 *.ipr
