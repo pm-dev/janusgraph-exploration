@@ -6,6 +6,7 @@ import com.syncleus.ferma.FramedGraph
 import com.syncleus.ferma.Traversable
 import com.syncleus.ferma.VertexFrame
 import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.future.await
 import kotlinx.coroutines.experimental.future.future
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
@@ -14,24 +15,39 @@ import org.dataloader.DataLoaderOptions
 import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
 
+//@Component
+//class TraversalLoader(
+//        graph: FramedGraph
+//): DataLoader<TraversalProvider, List<VertexFrame>>({ keys -> future {
+//    keys.map { key -> async {
+//        graph.traverse<Traversable<*, *>> { key(it) }.toList(VertexFrame::class.java)
+//    } }.map {
+//        it.await()
+//    }
+//} }, DataLoaderOptions()) {
+//
+//    fun load(key: (GraphTraversalSource) -> GraphTraversal<*, *>): CompletableFuture<List<VertexFrame>> =
+//            load(FunctionTraversalProvider(key))
+//
+//    fun <F: VertexFrame> load(key: Traversal.Bound<F, *>): CompletableFuture<List<VertexFrame>> =
+//            load(BoundTraversalProvider(key))
+//}
 
 @Component
 class TraversalLoader(
-        graph: FramedGraph,
-        options: DataLoaderOptions
-): DataLoader<TraversalProvider, List<VertexFrame>>({ keys -> future {
-    keys.map { key -> async {
-        graph.traverse<Traversable<*, *>> { key(it) }.toList(VertexFrame::class.java)
-    } }.map {
-        it.await()
+        private val graph: FramedGraph
+) {
+    private fun load(traversalProvider: TraversalProvider): CompletableFuture<List<VertexFrame>> {
+        return future { async {
+            graph.traverse<Traversable<*, *>> { traversalProvider(it) }.toList(VertexFrame::class.java)
+        }.await() }
     }
-} }, options) {
 
-    fun load(key: (GraphTraversalSource) -> GraphTraversal<*, *>): CompletableFuture<List<VertexFrame>>
-            = load(FunctionTraversalProvider(key))
+    fun load(key: (GraphTraversalSource) -> GraphTraversal<*, *>): CompletableFuture<List<VertexFrame>> =
+            load(FunctionTraversalProvider(key))
 
-    fun <F: VertexFrame> load(key: Traversal.Bound<F, *>): CompletableFuture<List<VertexFrame>>
-            = load(BoundTraversalProvider(key))
+    fun <F: VertexFrame> load(key: Traversal.Bound<F, *>): CompletableFuture<List<VertexFrame>> =
+            load(BoundTraversalProvider(key))
 }
 
 inline fun <reified T: VertexFrame> TraversalLoader.fetchOptional(
@@ -55,17 +71,23 @@ inline fun <reified T: VertexFrame> TraversalLoader.fetchMany(
             it.filterIsInstance(T::class.java)
         }
 
-inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(traversal: Traversal.BoundToOptional<F, T>): CompletableFuture<T?> =
+inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(
+        traversal: Traversal.BoundToOptional<F, out T>
+): CompletableFuture<T?> =
         load(traversal).thenApplyAsync {
             it.filterIsInstance(T::class.java).optional()
         }
 
-inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(traversal: Traversal.BoundToSingle<F, T>): CompletableFuture<T> =
+inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(
+        traversal: Traversal.BoundToSingle<F, out T>
+): CompletableFuture<T> =
         load(traversal).thenApplyAsync {
             it.filterIsInstance(T::class.java).single()
         }
 
-inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(traversal: Traversal.BoundToMany<F, out T>): CompletableFuture<List<T>> =
+inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(
+        traversal: Traversal.BoundToMany<F, out T>
+): CompletableFuture<List<T>> =
         load(traversal).thenApplyAsync {
             it.filterIsInstance(T::class.java)
         }
