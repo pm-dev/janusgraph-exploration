@@ -4,7 +4,7 @@ type Query {
     node(id: ID!): Node
 
     # Hero of the Star wars saga
-    hero: Character
+    hero: Character!
 
     # Find human by name
     human(name: String!): Human

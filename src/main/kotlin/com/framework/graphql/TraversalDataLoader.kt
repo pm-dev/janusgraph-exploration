@@ -1,7 +1,7 @@
 package com.framework.graphql
 
-import com.framework.gremlin.asGremlin
 import com.framework.datamodel.edges.Traversal
+import com.framework.gremlin.asGremlin
 import com.syncleus.ferma.FramedGraph
 import com.syncleus.ferma.Traversable
 import com.syncleus.ferma.VertexFrame
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture
 class TraversalLoader(
         graph: FramedGraph,
         options: DataLoaderOptions
-): DataLoader<(GraphTraversalSource) -> GraphTraversal<*, *>, List<VertexFrame>>({ keys -> future {
+): DataLoader<TraversalProvider, List<VertexFrame>>({ keys -> future {
     keys.map { key -> async {
         graph.traverse<Traversable<*, *>> { key(it) }.toList(VertexFrame::class.java)
     } }.map {
@@ -27,8 +27,11 @@ class TraversalLoader(
     }
 } }, options) {
 
-    fun <F: VertexFrame, T: VertexFrame> load(key: Traversal.Bound<F, T>): CompletableFuture<List<VertexFrame>> =
-            load { key.asGremlin(it) }
+    fun load(key: (GraphTraversalSource) -> GraphTraversal<*, *>): CompletableFuture<List<VertexFrame>>
+            = load(FunctionTraversalProvider(key))
+
+    fun <F: VertexFrame> load(key: Traversal.Bound<F, *>): CompletableFuture<List<VertexFrame>>
+            = load(BoundTraversalProvider(key))
 }
 
 inline fun <reified T: VertexFrame> TraversalLoader.fetchOptional(
@@ -69,3 +72,17 @@ inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(traver
 
 fun <T> Iterable<T>.optional(): T? =
         if (!iterator().hasNext()) null else single()
+
+// Implementing the following as data classes enables a data loader cache hit on the same traversal
+
+interface TraversalProvider {
+    operator fun invoke(source: GraphTraversalSource): GraphTraversal<*, *>
+}
+
+data class BoundTraversalProvider<F: VertexFrame>(private val traversal: Traversal.Bound<F, *>): TraversalProvider {
+    override fun invoke(source: GraphTraversalSource): GraphTraversal<*, *> = traversal.asGremlin(source)
+}
+
+data class FunctionTraversalProvider(private val traversal: (GraphTraversalSource) -> GraphTraversal<*, *>): TraversalProvider {
+    override fun invoke(source: GraphTraversalSource) = traversal(source)
+}
