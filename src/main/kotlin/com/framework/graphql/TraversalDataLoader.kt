@@ -51,22 +51,22 @@ inline fun <reified T: VertexFrame> TraversalLoader.fetchSingle(
 inline fun <reified T: VertexFrame> TraversalLoader.fetchMany(
         noinline traversal: (GraphTraversalSource) -> GraphTraversal<*, *>
 ): CompletableFuture<List<T>> =
-        load(traversal).thenApply {
+        load(traversal).thenApplyAsync {
             it.filterIsInstance(T::class.java)
         }
 
 inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(traversal: Traversal.BoundToOptional<F, T>): CompletableFuture<T?> =
-        this.load(traversal).thenApplyAsync {
+        load(traversal).thenApplyAsync {
             it.filterIsInstance(T::class.java).optional()
         }
 
 inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(traversal: Traversal.BoundToSingle<F, T>): CompletableFuture<T> =
-        this.load(traversal).thenApplyAsync {
+        load(traversal).thenApplyAsync {
             it.filterIsInstance(T::class.java).single()
         }
 
 inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(traversal: Traversal.BoundToMany<F, out T>): CompletableFuture<List<T>> =
-        this.load(traversal).thenApplyAsync {
+        load(traversal).thenApplyAsync {
             it.filterIsInstance(T::class.java)
         }
 

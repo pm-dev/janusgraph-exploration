@@ -17,7 +17,8 @@ fun <FROM: VertexFrame> Traversal.Bound<FROM, *>.asGremlin(
         initial = source.V(froms.map { from -> from.getId<Long>() }),
         operation = { traversal, hop -> traversal.out(hop.name) })
 
-fun GraphTraversalSource.vertexIds(vertexIds: Collection<Long>) = V(*vertexIds.toTypedArray())
+fun GraphTraversalSource.vertexIds(vertexIds: Collection<Long>): GraphTraversal<Vertex, Vertex>
+        = V(*vertexIds.toTypedArray())
 
 inline fun <reified T: VertexFrame> FramedGraph.insert(): T = addFramedVertex(T::class.java)
 

@@ -30,7 +30,8 @@ class Application {
 
     @Bean
     fun dataLoaderOptions(): DataLoaderOptions =
-            DataLoaderOptions()
+            // Turn off cache until I can figure out request scoped data-loading with the graphql servlet
+            DataLoaderOptions.newOptions().setCachingEnabled(false)
 
     @Bean
     fun graph(): JanusGraph =

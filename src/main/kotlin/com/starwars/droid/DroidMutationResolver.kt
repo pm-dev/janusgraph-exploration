@@ -6,6 +6,7 @@ import com.framework.gremlin.fetchMany
 import com.framework.gremlin.insert
 import com.framework.gremlin.mutate
 import com.framework.gremlin.vertexIds
+import com.starwars.character.Character
 import com.starwars.character.setAppearsIn
 import com.starwars.character.setFriends
 import com.syncleus.ferma.FramedGraph
@@ -27,11 +28,13 @@ class DroidMutationResolver(
         override fun checkPermissions(graph: FramedGraph) = true
 
         override fun run(graph: FramedGraph): Droid {
+            val friends = graph.fetchMany<Character> { it.vertexIds(friendIds) }
             val droid = graph.insert<Droid>()
             droid.setName(name)
             droid.setPrimaryFunction(primaryFunction)
             droid.setAppearsIn(graph.fetchMany { it.vertexIds(appearsInIds) })
-            droid.setFriends(graph.fetchMany { it.vertexIds(friendIds) })
+            droid.setFriends(friends)
+            friends.forEach { it.addFriend(droid) }
             return droid
         }
     })
