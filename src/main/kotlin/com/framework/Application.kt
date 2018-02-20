@@ -10,18 +10,8 @@ import org.springframework.core.io.ClassPathResource
 
 
 @SpringBootApplication
-@ComponentScan(basePackages = ["com.framework", "com.starwars"])
+@ComponentScan(basePackages = ["com"])
 class Application {
-
-//    @Bean
-//    fun dataLoaderRegistry(loaderList: List<DataLoader<*, *>>): DataLoaderRegistry =
-//            loaderList.fold(
-//                initial = DataLoaderRegistry(),
-//                operation = { registry, loader -> registry.register(loader.javaClass.simpleName, loader)})
-//
-//    @Bean
-//    fun instrumentation(dataLoaderRegistry: DataLoaderRegistry): Instrumentation =
-//            DataLoaderDispatcherInstrumentation(dataLoaderRegistry)
 
     @Bean
     fun graph(): JanusGraph =
