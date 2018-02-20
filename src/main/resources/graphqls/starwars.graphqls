@@ -75,7 +75,7 @@ type Human implements Node, Character {
     # The home planet of the human, or null if unknown
     homePlanet: String
 
-    # The friends of the droid, or an empty list if they have none
+    # The friends of the human's friends
     secondDegreeFriends(limit: Int): [Character!]!
 }
 
@@ -97,6 +97,6 @@ type Droid implements Node, Character {
     # The primary function of the droid
     primaryFunction: String!
 
-    # The friends of the droid, or an empty list if they have none
+    # The friends of the droid's friends
     secondDegreeFriends(limit: Int): [Character!]!
 }

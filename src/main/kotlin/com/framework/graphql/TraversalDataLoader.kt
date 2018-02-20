@@ -6,15 +6,16 @@ import com.syncleus.ferma.FramedGraph
 import com.syncleus.ferma.Traversable
 import com.syncleus.ferma.VertexFrame
 import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.future.await
 import kotlinx.coroutines.experimental.future.future
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
-import org.dataloader.DataLoader
-import org.dataloader.DataLoaderOptions
 import org.springframework.stereotype.Component
 import java.util.concurrent.CompletableFuture
 
+/**
+ * Turning off the traversal loader below because graphql-tools does not yet support
+ * request-scoped components. Batched data loading requires the batches to be request scoped.
+ */
 //@Component
 //class TraversalLoader(
 //        graph: FramedGraph
@@ -95,7 +96,10 @@ inline fun <F: VertexFrame, reified T: VertexFrame> TraversalLoader.fetch(
 fun <T> Iterable<T>.optional(): T? =
         if (!iterator().hasNext()) null else single()
 
-// Implementing the following as data classes enables a data loader cache hit on the same traversal
+/**
+ * Implementing TraversalProvider as data classes enable equality checks which allow TraversalProviders
+ * to be cached (if a TraversalLoader has caching capabilities.
+ */
 
 interface TraversalProvider {
     operator fun invoke(source: GraphTraversalSource): GraphTraversal<*, *>

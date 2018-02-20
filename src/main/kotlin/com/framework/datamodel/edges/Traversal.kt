@@ -80,20 +80,20 @@ interface Traversal<FROM, TO> {
     }
 }
 
-fun <FROM, TO> FROM.traverse(relationship: Relationship.ToOptional<FROM, TO>) =
+fun <FROM, TO> FROM.to(relationship: Relationship.ToOptional<FROM, TO>) =
         Traversal.SingleBoundToOptional(from = this, relationship = relationship)
 
-fun <FROM, TO> Collection<FROM>.traverse(relationship: Relationship.ToOptional<FROM, TO>) =
+fun <FROM, TO> Collection<FROM>.to(relationship: Relationship.ToOptional<FROM, TO>) =
         Traversal.MultiBoundToOptional(froms = this, relationship = relationship)
 
-fun <FROM, TO> FROM.traverse(relationship: Relationship.ToSingle<FROM, TO>) =
+fun <FROM, TO> FROM.to(relationship: Relationship.ToSingle<FROM, TO>) =
         Traversal.SingleBoundToSingle(from = this, relationship = relationship)
 
-fun <FROM, TO> Collection<FROM>.traverse(relationship: Relationship.ToSingle<FROM, TO>) =
+fun <FROM, TO> Collection<FROM>.to(relationship: Relationship.ToSingle<FROM, TO>) =
         Traversal.MultiBoundToSingle(froms = this, relationship = relationship)
 
-fun <FROM, TO> FROM.traverse(relationship: Relationship.ToMany<FROM, TO>) =
+fun <FROM, TO> FROM.to(relationship: Relationship.ToMany<FROM, TO>) =
         Traversal.SingleBoundToMany(from = this, relationship = relationship)
 
-fun <FROM, TO> Collection<FROM>.traverse(relationship: Relationship.ToMany<FROM, TO>) =
+fun <FROM, TO> Collection<FROM>.to(relationship: Relationship.ToMany<FROM, TO>) =
         Traversal.MultiBoundToMany(froms = this, relationship = relationship)

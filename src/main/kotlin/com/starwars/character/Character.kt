@@ -1,7 +1,8 @@
 package com.starwars.character
 
-import com.framework.datamodel.edges.Hop
-import com.framework.datamodel.edges.traverse
+
+import com.framework.datamodel.edges.Relationship
+import com.framework.datamodel.edges.to
 import com.framework.datamodel.node.Node
 import com.starwars.episode.Episode
 import com.syncleus.ferma.annotations.Adjacency
@@ -16,11 +17,11 @@ abstract class Character: Node() {
     @Property("name")
     abstract fun setName(name: String)
 
-    val toAppearsIn get() = traverse(Companion.toAppearsIn)
+    val toAppearsIn get() = to(appearsIn)
 
-    val toFriends get() = traverse(Companion.toFriends)
+    val toFriends get() = to(friends)
 
-    val toSecondDegreeFriends get() = traverse(Companion.toSecondDegreeFriends)
+    val toSecondDegreeFriends get() = to(secondDegreeFriends)
 
     @Incidence(label = "friends")
     abstract fun addFriend(friend: Character)
@@ -35,9 +36,9 @@ abstract class Character: Node() {
     abstract fun setAppearsIn(appearsIn: Set<Episode>)
 
     companion object {
-        val toFriends = Hop.AsymmetricManyToMany<Character, Character>(name = "friends")
-        val toSecondDegreeFriends = toFriends.to(toFriends)
-        val toAppearsIn = Hop.AsymmetricManyToMany<Character, Episode>(name = "appearsIn")
+        val friends = Relationship.AsymmetricManyToMany<Character, Character>(name = "friends")
+        val secondDegreeFriends = friends.to(friends)
+        val appearsIn = Relationship.AsymmetricManyToMany<Character, Episode>(name = "appearsIn")
     }
 }
 
