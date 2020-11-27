@@ -1,6 +1,6 @@
 # An Example GraphQL + JanusGraph Web App 
 
-This repository demonstrates how to implement a graph-based web application using JanusGraph. It is written in Kotlin and exposes a GraphQL interface. It is based on a blog post from [Excuse The Disruption](http://excusethedisruption.com/a-graphql-and-janusgraph-web-app/)
+This repository demonstrates how to implement a graph-based web application using JanusGraph. It is written in Kotlin and exposes a GraphQL interface.
 
 The application was written using:
 
